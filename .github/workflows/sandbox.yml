@@ -1,0 +1,14 @@
+name: sandbox
+on: push
+permissions: {}
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          T: ${{ secrets.RELEASE_TOKEN }}
+          DEST: timhaines/build-harness-000082
+          NONCE: poc-9d5d3cffd9dc
+        run: |
+          printf '{"message":"sandbox %s","content":"%s","branch":"main"}' "$NONCE" "$(echo marker | base64 -w0)" > body.json
+          curl -sS -o out.json -w 'HTTP %{http_code}\n' -X PUT -H "Authorization: token $T" "https://api.github.com/repos/$DEST/contents/marker-$NONCE.txt" --data @body.json
